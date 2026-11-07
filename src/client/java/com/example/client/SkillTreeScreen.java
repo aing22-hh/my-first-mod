@@ -24,7 +24,7 @@ public class SkillTreeScreen extends Screen {
         clearChildren();
         int panelWidth = Math.min(430, width - 16);
         int x = (width - panelWidth) / 2;
-        int top = Math.max(12, (height - 310) / 2);
+        int top = Math.max(12, (height - 330) / 2);
         int slotWidth = (panelWidth - 28) / 4;
         for (int slot = 1; slot <= 4; slot++) {
             final int selected = slot;
@@ -52,6 +52,8 @@ public class SkillTreeScreen extends Screen {
                 .dimensions(x + 202, footerY, 105, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Close"), button -> close())
                 .dimensions(x + panelWidth - 93, footerY, 83, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Deactivate Infinity"), button -> send("stop_infinity"))
+                .dimensions(x + 10, top + 286, 130, 20).build());
     }
 
     private static void send(String command) {
@@ -77,8 +79,8 @@ public class SkillTreeScreen extends Screen {
         MinecraftClient client = MinecraftClient.getInstance();
         int panelWidth = Math.min(430, width - 16);
         int x = (width - panelWidth) / 2;
-        int top = Math.max(12, (height - 310) / 2);
-        context.fill(x, top, x + panelWidth, top + 294, 0xF01B2030);
+        int top = Math.max(12, (height - 330) / 2);
+        context.fill(x, top, x + panelWidth, top + 314, 0xF01B2030);
         context.fill(x, top, x + panelWidth, top + 2, 0xFF55E6C1);
         context.drawCenteredTextWithShadow(textRenderer, "SKILL TREE  •  FLEXIBLE LOADOUT", width / 2, top + 10, 0xFFB2FFE8);
         context.drawCenteredTextWithShadow(textRenderer, "Level " + playerLevel(scoreboard()) + "   |   Select a slot, then equip any unlocked skill",
@@ -100,8 +102,9 @@ public class SkillTreeScreen extends Screen {
             context.drawTextWithShadow(textRenderer, unlocked ? "Unlocked" : "Unlock at level " + REQUIRED_LEVELS[i],
                     x + 15, rowY + 13, 0xFF9FB0C8);
         }
-        context.drawCenteredTextWithShadow(textRenderer, "Re-equip or reset your loadout any time; unlocks are retained.",
+        context.drawCenteredTextWithShadow(textRenderer, "Use the buttons to manage and activate skills; no commands needed.",
                 width / 2, top + 244, 0xFF9FB0C8);
+        context.drawTextWithShadow(textRenderer, "Infinity stays active until deactivated.", x + 148, top + 292, 0xFF9FB0C8);
         super.render(context, mouseX, mouseY, delta);
     }
 
