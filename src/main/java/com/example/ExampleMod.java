@@ -227,12 +227,12 @@ public class ExampleMod implements ModInitializer {
                     if (distance > 8.0 || distance < 0.001) continue;
                     Vec3d direction = offset.normalize();
                     if (look.dotProduct(direction) < 0.78) continue;
-                    if (target.damage(player.getDamageSources().playerAttack(player), 8.0F)) {
-                        target.addVelocity(direction.x * 0.65, 0.18, direction.z * 0.65);
-                        hits++;
-                    }
+                    // Kai is an entity-only attack: instant kill and no changes to blocks in the world.
+                    if (target instanceof PlayerEntity) continue;
+                    target.kill(player.getWorld());
+                    hits++;
                 }
-                player.sendMessage(Text.literal("Kai: Cleave! " + hits + " target(s) cut.")
+                player.sendMessage(Text.literal("Kai: Cleave! " + hits + " monster(s) eliminated.")
                         .formatted(Formatting.DARK_RED, Formatting.BOLD), false);
                 return hits;
             }
