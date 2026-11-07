@@ -212,9 +212,9 @@ public class ExampleMod implements ModInitializer {
             case 0 -> player.addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, 20 * 30, 0));
             case 1 -> player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 20 * 60 * 5, 0));
             case 2 -> {
-                ScoreboardObjective timer = getOrCreateObjective(scoreboard, INFINITY_TICKS_OBJECTIVE, "Infinity duration");
-                scoreboard.getOrCreateScore(player.getScoreboardEntryName(), timer).setScore(20 * 30);
-                player.sendMessage(Text.literal("Mukagen: Infinity is active for 30 seconds.").formatted(Formatting.AQUA), false);
+                ScoreboardObjective timer = getOrCreateObjective(scoreboard, INFINITY_TICKS_OBJECTIVE, "Infinity active");
+                scoreboard.getOrCreateScore(player.getScoreboardEntryName(), timer).setScore(1);
+                player.sendMessage(Text.literal("Mukagen: Infinity is active until you deactivate it.").formatted(Formatting.AQUA), false);
                 return 1;
             }
             case 3 -> {
@@ -227,7 +227,6 @@ public class ExampleMod implements ModInitializer {
                     if (distance > 8.0 || distance < 0.001) continue;
                     Vec3d direction = offset.normalize();
                     if (look.dotProduct(direction) < 0.78) continue;
-                    // Kai is an entity-only attack: instant kill and no changes to blocks in the world.
                     if (target instanceof PlayerEntity) continue;
                     target.kill(player.getWorld());
                     hits++;
@@ -242,14 +241,13 @@ public class ExampleMod implements ModInitializer {
         return 1;
     }
 
-    /** Infinity continuously creates space around its user, rather than only granting damage resistance. */
+    /** Infinity remains active until the player explicitly deactivates it. */
     private static void tickInfinity(ServerPlayerEntity player) {
         Scoreboard scoreboard = player.getWorld().getScoreboard();
         ScoreboardObjective timerObjective = scoreboard.getNullableObjective(INFINITY_TICKS_OBJECTIVE);
         if (timerObjective == null) return;
-        ScoreboardScore timer = scoreboard.getOrCreateScore(player.getScoreboardEntryName(), timerObjective);
-        int ticksLeft = timer.getScore();
-        if (ticksLeft <= 0) return;
+        int active = scoreboard.getOrCreateScore(player.getScoreboardEntryName(), timerObjective).getScore();
+        if (active <= 0) return;
 
         double radius = 3.25;
         for (LivingEntity entity : player.getWorld().getEntitiesByClass(LivingEntity.class,
@@ -261,8 +259,6 @@ public class ExampleMod implements ModInitializer {
             double force = 0.22 + (radius - distance) * 0.10;
             entity.addVelocity(dx / distance * force, 0.08, dz / distance * force);
         }
-        timer.setScore(ticksLeft - 1);
-        if (ticksLeft == 1) player.sendMessage(Text.literal("Mukagen: Infinity faded.").formatted(Formatting.GRAY), false);
     }
 
     private static int stopInfinity(ServerPlayerEntity player) {
